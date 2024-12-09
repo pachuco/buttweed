@@ -11,21 +11,21 @@
 
 
 typedef enum {
-    FAITHERR_OK,
+    FAITH_ERROR_OK,
     //....
     
-    FAITHERR_ERROR = -1,
-} FAITHERR;
+    FAITH_ERROR_ERROR = -1,
+} FAITH_ERROR;
 
 typedef enum {
-    COMP_UNK,
-    COMP_AUDIO_DECODER,
-    COMP_SYNTH,
-    COMP_FORMAT_PARSER,
-    COMP_LSI_SIMULATOR,
+    FAITH_TYPE_UNK,
+    FAITH_TYPE_AUDIO_DECODER,
+    FAITH_TYPE_SYNTH,
+    FAITH_TYPE_FORMAT_PARSER,
+    FAITH_TYPE_LSI_SIMULATOR,
     
     NUM_COMPONENTS
-} COMPTYPE;
+} FAITH_COMPTYPE;
 
 typedef struct {
     DWORD UNK;
@@ -34,45 +34,45 @@ typedef struct {
     DWORD verMid;
     DWORD verMin;
     char name[256];
-} ComponentInfo;
+} FaithComponentInfo;
 
 /////////////////////////////////////////////////////////////////////
 //Player1
-typedef struct Player1 Player1; 
+typedef struct FaithPlayer1 FaithPlayer1; 
 
-struct Player1 {
+struct FaithPlayer1 {
   BYTE unk[620];
 };
 
 /////////////////////////////////////////////////////////////////////
 //Player2
-typedef struct Player2 Player2; 
+typedef struct FaithPlayer2 FaithPlayer2; 
 
-struct Player2 {
+struct FaithPlayer2 {
   BYTE unk[668];
 };
 
 /////////////////////////////////////////////////////////////////////
 //Player3
-typedef struct Player3 Player3; 
+typedef struct FaithPlayer3 FaithPlayer3; 
 
-struct Player3 {
+struct FaithPlayer3 {
   BYTE unk[620];
 };
 
 /////////////////////////////////////////////////////////////////////
 //Player4
-typedef struct Player4 Player4; 
+typedef struct FaithPlayer4 FaithPlayer4; 
 
-struct Player4 {
+struct FaithPlayer4 {
   BYTE unk[672];
 };
 
 /////////////////////////////////////////////////////////////////////
 //Player5
-typedef struct Player5 Player5; 
+typedef struct FaithPlayer5 FaithPlayer5; 
 
-struct Player5 {
+struct FaithPlayer5 {
   BYTE unk[672];
 };
 
@@ -80,22 +80,22 @@ struct Player5 {
 //Synth2
 #define SYNTH2_RENDERBUF 128
 
-typedef struct Synth2 Synth2;
+typedef struct FaithSynth2 FaithSynth2;
 
-struct Synth2 {
+struct FaithSynth2 {
     void* opaqueBase; //sizeof, 744
     DWORD polyphony;
     DWORD UNK;
     
-    CDECL void     (*fpFree)            (Synth2* pSynth);
-    CDECL FAITHERR (*fpRender)          (Synth2* pSynth, int32_t pBufInOut[2*128]);
-    CDECL int      (*fpUseless1)        (Synth2* pSynth);
-    CDECL void     (*fpKindaUseless1)   (Synth2* pSynth);
+    CDECL void     (*fpFree)            (FaithSynth2* pSynth);
+    CDECL FAITH_ERROR (*fpRender)          (FaithSynth2* pSynth, int32_t pBufInOut[2*128]);
+    CDECL int      (*fpUseless1)        (FaithSynth2* pSynth);
+    CDECL void     (*fpKindaUseless1)   (FaithSynth2* pSynth);
     CDECL void     (*fpUseless2)        (void);
-    CDECL FAITHERR (*fpMidiFeed)        (Synth2* pSynth, int unused, BYTE pDat[4], int numMessages);
-    CDECL FAITHERR (*fpSysexFeed)       (Synth2* pSynth, int unused, BYTE pDat[8]);
-    CDECL void     (*fpFunc10)          (Synth2* pSynth, int unused, int a3, void* unkStruct);
-    CDECL FAITHERR (*fpFunc11)          (Synth2* pSynth, int unused, int zero, BYTE* a4, int one);
+    CDECL FAITH_ERROR (*fpMidiFeed)        (FaithSynth2* pSynth, int unused, BYTE pDat[4], int numMessages);
+    CDECL FAITH_ERROR (*fpSysexFeed)       (FaithSynth2* pSynth, int unused, BYTE pDat[8]);
+    CDECL void     (*fpFunc10)          (FaithSynth2* pSynth, int unused, int a3, void* unkStruct);
+    CDECL FAITH_ERROR (*fpFunc11)          (FaithSynth2* pSynth, int unused, int zero, BYTE* a4, int one);
 };
 
 /*
@@ -132,95 +132,95 @@ struct Synth2 {
 /////////////////////////////////////////////////////////////////////
 //Synth4
 
-typedef struct Synth4p1 Synth4p1;
-typedef struct Synth4p2 Synth4p2;
-typedef struct Synth4   Synth4;
+typedef struct FaithSynth4p1 FaithSynth4p1;
+typedef struct FaithSynth4p2 FaithSynth4p2;
+typedef struct FaithSynth4   FaithSynth4;
 
-struct Synth4p1 {
+struct FaithSynth4p1 {
     void* opaqueBase; //sizeof, 1088
     DWORD UNK1;
     DWORD UNK2;
     
-    CDECL void      (*fpFree)           (Synth4p1* pSynth);
-    CDECL FAITHERR  (*fpRender)         (Synth4p1* pSynth, int32_t pBufInOut[2*128]);
-    CDECL int       (*fpUseless1)       (Synth4p1* pSynth);
-    CDECL FAITHERR  (*fpKindaUseless1)  (Synth4p1* pSynth, int polyphony);
-    CDECL int       (*fpFunc7)          (Synth4p1* pSynth, int a2);
-    CDECL FAITHERR  (*fpMidiFeed)       (Synth4p1* pSynth, int dunno, BYTE pDat[4], int numMessages);
-    CDECL FAITHERR  (*fpSysexFeed)      (Synth4p1* pSynth, int dunno, BYTE* pDat, int numBytes);
-    CDECL FAITHERR  (*fpFunc10)         (Synth4p1* pSynth, int a2, int a3, int a4, int a5);
+    CDECL void      (*fpFree)           (FaithSynth4p1* pSynth);
+    CDECL FAITH_ERROR  (*fpRender)         (FaithSynth4p1* pSynth, int32_t pBufInOut[2*128]);
+    CDECL int       (*fpUseless1)       (FaithSynth4p1* pSynth);
+    CDECL FAITH_ERROR  (*fpKindaUseless1)  (FaithSynth4p1* pSynth, int polyphony);
+    CDECL int       (*fpFunc7)          (FaithSynth4p1* pSynth, int a2);
+    CDECL FAITH_ERROR  (*fpMidiFeed)       (FaithSynth4p1* pSynth, int dunno, BYTE pDat[4], int numMessages);
+    CDECL FAITH_ERROR  (*fpSysexFeed)      (FaithSynth4p1* pSynth, int dunno, BYTE* pDat, int numBytes);
+    CDECL FAITH_ERROR  (*fpFunc10)         (FaithSynth4p1* pSynth, int a2, int a3, int a4, int a5);
     void* unused;
 };
 
-struct Synth4p2 {
+struct FaithSynth4p2 {
     void* opaqueBase; //sizeof, 4380
     DWORD UNK;
     
-    CDECL void (*fpFree)        (Synth4p2* pSynth);
-    CDECL void (*fpFunc3)       (Synth4p2* pSynth, int a2);
-    CDECL void (*fpFunc4)       (Synth4p2* pSynth);
-    CDECL void (*fpFunc5)       (Synth4p2* pSynth, int a2);
-    CDECL void (*fpFunc6)       (Synth4p2* pSynth, int a2);
-    CDECL void (*fpFunc7)       (Synth4p2* pSynth, int a2);
-    CDECL void (*fpFunc8)       (Synth4p2* pSynth, int a2);
-    CDECL void (*fpFunc9)       (Synth4p2* pSynth, int a2, int a3, SHORT a4, SHORT a5, int a6, BYTE a7);
-    CDECL void (*fpFunc10)      (Synth4p2* pSynth, int a2);
-    CDECL void (*fpFunc11)      (Synth4p2* pSynth, int a2, SHORT a3, SHORT a4);
-    CDECL void (*fpFunc12)      (Synth4p2* pSynth, int a2, int a3);
-    CDECL void (*fpFunc13)      (Synth4p2* pSynth, int a2, BYTE a3);
-    CDECL void (*fpFunc14)      (Synth4p2* pSynth, int a2, unsigned int a3);
+    CDECL void (*fpFree)        (FaithSynth4p2* pSynth);
+    CDECL void (*fpFunc3)       (FaithSynth4p2* pSynth, int a2);
+    CDECL void (*fpFunc4)       (FaithSynth4p2* pSynth);
+    CDECL void (*fpFunc5)       (FaithSynth4p2* pSynth, int a2);
+    CDECL void (*fpFunc6)       (FaithSynth4p2* pSynth, int a2);
+    CDECL void (*fpFunc7)       (FaithSynth4p2* pSynth, int a2);
+    CDECL void (*fpFunc8)       (FaithSynth4p2* pSynth, int a2);
+    CDECL void (*fpFunc9)       (FaithSynth4p2* pSynth, int a2, int a3, SHORT a4, SHORT a5, int a6, BYTE a7);
+    CDECL void (*fpFunc10)      (FaithSynth4p2* pSynth, int a2);
+    CDECL void (*fpFunc11)      (FaithSynth4p2* pSynth, int a2, SHORT a3, SHORT a4);
+    CDECL void (*fpFunc12)      (FaithSynth4p2* pSynth, int a2, int a3);
+    CDECL void (*fpFunc13)      (FaithSynth4p2* pSynth, int a2, BYTE a3);
+    CDECL void (*fpFunc14)      (FaithSynth4p2* pSynth, int a2, unsigned int a3);
 };
 
-struct Synth4 {
-    Synth4p1* ptr1;
-    Synth4p2* ptr2;
+struct FaithSynth4 {
+    FaithSynth4p1* ptr1;
+    FaithSynth4p2* ptr2;
 };
 
 /////////////////////////////////////////////////////////////////////
 //Synth5
 
-typedef struct Synth5p1 Synth5p1;
-typedef struct Synth5p2 Synth5p2;
-typedef struct Synth5 Synth5;
+typedef struct FaithSynth5p1 FaithSynth5p1;
+typedef struct FaithSynth5p2 FaithSynth5p2;
+typedef struct FaithSynth5   FaithSynth5;
 
-struct Synth5p1 {
+struct FaithSynth5p1 {
     void* opaqueBase; //sizeof, 1088
     DWORD UNK1;
     DWORD UNK2;
     
-    CDECL void (*fpFree)        (Synth5p1* pSynth);
-    CDECL void (*fpRender)      (Synth5p1* pSynth, int32_t pBufInOut[2*128]);
-    CDECL void (*fpUseless1)    (Synth5p1* pSynth);
-    CDECL void (*fpFunc6)       (Synth5p1* pSynth, int a2);
-    CDECL void (*fpFunc7)       (Synth5p1* pSynth, int a2);
-    CDECL void (*fpFunc8)       (Synth5p1* pSynth, int a2, int a3, int a4);
-    CDECL void (*fpFunc9)       (Synth5p1* pSynth, int a2, int a3, int a4);
-    CDECL void (*fpFunc10)      (Synth5p1* pSynth, int a2, int a3, int a4, int a5);
+    CDECL void (*fpFree)        (FaithSynth5p1* pSynth);
+    CDECL void (*fpRender)      (FaithSynth5p1* pSynth, int32_t pBufInOut[2*128]);
+    CDECL void (*fpUseless1)    (FaithSynth5p1* pSynth);
+    CDECL void (*fpFunc6)       (FaithSynth5p1* pSynth, int a2);
+    CDECL void (*fpFunc7)       (FaithSynth5p1* pSynth, int a2);
+    CDECL void (*fpFunc8)       (FaithSynth5p1* pSynth, int a2, int a3, int a4);
+    CDECL void (*fpFunc9)       (FaithSynth5p1* pSynth, int a2, int a3, int a4);
+    CDECL void (*fpFunc10)      (FaithSynth5p1* pSynth, int a2, int a3, int a4, int a5);
     void* unused;
 };
 
-struct Synth5p2 {
+struct FaithSynth5p2 {
     void* opaqueBase; //sizeof, 144
     DWORD polyphony;
     
-    CDECL void (*fpFree)        (Synth5p2* pSynth);
-    CDECL FAITHERR (*fpFunc3)   (Synth5p2* pSynth, void* a2); //render?
-    CDECL void (*fpFunc4)       (Synth5p2* pSynth); //double deref
-    CDECL void (*fpFunc5)       (Synth5p2* pSynth, int voiceIdx); //some other double deref, a2 < 32, voice something
-    CDECL void (*fpFunc6)       (Synth5p2* pSynth, int voiceIdx); //same
-    CDECL void (*fpFunc7)       (Synth5p2* pSynth, int voiceIdx); //same
-    CDECL void (*fpFunc8)       (Synth5p2* pSynth, int voiceIdx); //same
-    CDECL void (*fpFunc9)       (Synth5p2* pSynth, signed int a2, BYTE *a3, USHORT a4, USHORT a5, int a6, BYTE a7); //maybe midiFeed
-    CDECL void (*fpFunc10)      (Synth5p2* pSynth, int voiceIdx); //voice something
-    CDECL void (*fpFunc11)      (Synth5p2* pSynth, int voiceIdx, SHORT a3, SHORT a4); //voice something-else
-    CDECL void (*fpFunc12)      (Synth5p2* pSynth, int voiceIdx, DWORD a3); //voice something-else 2
-    CDECL void (*fpFunc13)      (Synth5p2* pSynth, int voiceIdx, BYTE a3); //voice something-else 3
+    CDECL void (*fpFree)        (FaithSynth5p2* pSynth);
+    CDECL FAITH_ERROR (*fpFunc3)   (FaithSynth5p2* pSynth, void* a2); //render?
+    CDECL void (*fpFunc4)       (FaithSynth5p2* pSynth); //double deref
+    CDECL void (*fpFunc5)       (FaithSynth5p2* pSynth, int voiceIdx); //some other double deref, a2 < 32, voice something
+    CDECL void (*fpFunc6)       (FaithSynth5p2* pSynth, int voiceIdx); //same
+    CDECL void (*fpFunc7)       (FaithSynth5p2* pSynth, int voiceIdx); //same
+    CDECL void (*fpFunc8)       (FaithSynth5p2* pSynth, int voiceIdx); //same
+    CDECL void (*fpFunc9)       (FaithSynth5p2* pSynth, signed int a2, BYTE *a3, USHORT a4, USHORT a5, int a6, BYTE a7); //maybe midiFeed
+    CDECL void (*fpFunc10)      (FaithSynth5p2* pSynth, int voiceIdx); //voice something
+    CDECL void (*fpFunc11)      (FaithSynth5p2* pSynth, int voiceIdx, SHORT a3, SHORT a4); //voice something-else
+    CDECL void (*fpFunc12)      (FaithSynth5p2* pSynth, int voiceIdx, DWORD a3); //voice something-else 2
+    CDECL void (*fpFunc13)      (FaithSynth5p2* pSynth, int voiceIdx, BYTE a3); //voice something-else 3
     void* unused;
 };
 
-struct Synth5 {
-    Synth5p1* p1;
-    Synth5p2* p2;
+struct FaithSynth5 {
+    FaithSynth5p1* p1;
+    FaithSynth5p2* p2;
 };
 
 
@@ -238,38 +238,38 @@ struct Synth5 {
 // DLL interfaces
 
 // common
-CDECL FAITHERR RTPDllGetVersion(ComponentInfo* pSi, DWORD siSize);
+CDECL FAITH_ERROR   RTPDllGetVersion(FaithComponentInfo* pSi, DWORD siSize);
 // synth dll specific
-CDECL void*    RTPSynthOpen(DWORD* type);
-CDECL int      RTPSynthClose(void* pPlayer);
+CDECL void*         RTPSynthOpen(DWORD* type);
+CDECL int           RTPSynthClose(void* pPlayer);
 // player dll specific
-CDECL void*    RTPPlayerOpen(void** ppPlayer);
-CDECL FAITHERR RTPPlayerClose(void* pPlayer);
-CDECL FAITHERR RTPPlayerPlay(void* pPlayer);
-CDECL FAITHERR RTPPlayerStop(void* pPlayer);
-CDECL FAITHERR RTPPlayerSeek(void* pPlayer, int a2);
-CDECL FAITHERR RTPPlayerGetTime(void* pPlayer);
-CDECL FAITHERR RTPPlayerGetState(void* pPlayer);
-CDECL FAITHERR RTPPlayerGetExt(void* pPlayer);
+CDECL void*         RTPPlayerOpen(void** ppPlayer);
+CDECL FAITH_ERROR   RTPPlayerClose(void* pPlayer);
+CDECL FAITH_ERROR   RTPPlayerPlay(void* pPlayer);
+CDECL FAITH_ERROR   RTPPlayerStop(void* pPlayer);
+CDECL FAITH_ERROR   RTPPlayerSeek(void* pPlayer, int a2);
+CDECL FAITH_ERROR   RTPPlayerGetTime(void* pPlayer);
+CDECL FAITH_ERROR   RTPPlayerGetState(void* pPlayer);
+CDECL FAITH_ERROR   RTPPlayerGetExt(void* pPlayer);
 
 #ifdef VALIDATESTRUCTSIZES
 
-static_assert(sizeof(ComponentInfo) == 276, "");
+static_assert(sizeof(FaithComponentInfo) == 276, "");
 
-static_assert(sizeof(Player1) == 620, "");
-static_assert(sizeof(Player2) == 668, "");
-static_assert(sizeof(Player3) == 620, "");
-static_assert(sizeof(Player4) == 672, "");
-static_assert(sizeof(Player5) == 672, "");
+static_assert(sizeof(FaithPlayer1) == 620, "");
+static_assert(sizeof(FaithPlayer2) == 668, "");
+static_assert(sizeof(FaithPlayer3) == 620, "");
+static_assert(sizeof(FaithPlayer4) == 672, "");
+static_assert(sizeof(FaithPlayer5) == 672, "");
 
-static_assert(sizeof(Synth2) == 48, "");
+static_assert(sizeof(FaithSynth2) == 48, "");
 
-static_assert(sizeof(Synth4p1) == 48, "");
-static_assert(sizeof(Synth4p2) == 60, "");
-static_assert(sizeof(Synth4) == 8, "");
+static_assert(sizeof(FaithSynth4p1) == 48, "");
+static_assert(sizeof(FaithSynth4p2) == 60, "");
+static_assert(sizeof(FaithSynth4) == 8, "");
 
-static_assert(sizeof(Synth5p1) == 48, "");
-static_assert(sizeof(Synth5p2) == 60, "");
-static_assert(sizeof(Synth5) == 8, "");
+static_assert(sizeof(FaithSynth5p1) == 48, "");
+static_assert(sizeof(FaithSynth5p2) == 60, "");
+static_assert(sizeof(FaithSynth5) == 8, "");
 
 #endif
