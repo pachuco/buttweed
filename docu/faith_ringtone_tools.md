@@ -2,7 +2,8 @@
 
 An emulator for several mobile phone midi chipsets.
 
-Installer: RTATSetup1.5.0.exe
+Installer: [RTATSetup1.5.0.exe](http://onj3.andrelouis.com/phonetones/Software%20and%20Soundbanks/Software/CMX/Faith%20Ring%20Tone%20Authoring%20Tool%201.5.0.zip)
+
 
 Modules:
 - rt_player_1.dll
