@@ -1,126 +1,169 @@
 <?xml version="1.0"?>
-	<!--
-	API Monitor Filter
-	(c) 2010-2013, Rohitab Batra <rohitab@rohitab.com>
-	http://www.rohitab.com/apimonitor/
-	-->
+    <!--
+    API Monitor Filter
+    (c) 2010-2013, Rohitab Batra <rohitab@rohitab.com>
+    http://www.rohitab.com/apimonitor/
+    -->
 <ApiMonitor>
-    <Include Filename="Headers\windows.h.xml" />
-    
-    <!--------------------------------------------------------------------------->
-    <!-- Players -->
-    <Module Name="rt_player_1.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPPlayerClose"/>
-        <Api Name="RTPPlayerGetExt"/>
-        <Api Name="RTPPlayerGetState"/>
-        <Api Name="RTPPlayerGetTime"/>
-        <Api Name="RTPPlayerOpen"/>
-        <Api Name="RTPPlayerPlay"/>
-        <Api Name="RTPPlayerSeek"/>
-        <Api Name="RTPPlayerStop"/>
-    </Module>
-    
-    <Module Name="rt_player_2.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPPlayerClose"/>
-        <Api Name="RTPPlayerGetExt"/>
-        <Api Name="RTPPlayerGetState"/>
-        <Api Name="RTPPlayerGetTime"/>
-        <Api Name="RTPPlayerOpen"/>
-        <Api Name="RTPPlayerPlay"/>
-        <Api Name="RTPPlayerSeek"/>
-        <Api Name="RTPPlayerStop"/>
-    </Module>
-    
-    <Module Name="rt_player_3.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPPlayerClose"/>
-        <Api Name="RTPPlayerGetExt"/>
-        <Api Name="RTPPlayerGetState"/>
-        <Api Name="RTPPlayerGetTime"/>
-        <Api Name="RTPPlayerOpen"/>
-        <Api Name="RTPPlayerPlay"/>
-        <Api Name="RTPPlayerSeek"/>
-        <Api Name="RTPPlayerStop"/>
-    </Module>
-    
-    <Module Name="rt_player_4.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPPlayerClose"/>
-        <Api Name="RTPPlayerGetExt"/>
-        <Api Name="RTPPlayerGetState"/>
-        <Api Name="RTPPlayerGetTime"/>
-        <Api Name="RTPPlayerOpen"/>
-        <Api Name="RTPPlayerPlay"/>
-        <Api Name="RTPPlayerSeek"/>
-        <Api Name="RTPPlayerStop"/>
-    </Module>
-    
-    <Module Name="rt_player_5.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPPlayerClose"/>
-        <Api Name="RTPPlayerGetExt"/>
-        <Api Name="RTPPlayerGetState"/>
-        <Api Name="RTPPlayerGetTime"/>
-        <Api Name="RTPPlayerOpen"/>
-        <Api Name="RTPPlayerPlay"/>
-        <Api Name="RTPPlayerSeek"/>
-        <Api Name="RTPPlayerStop"/>
-    </Module>
-    
-    <!--------------------------------------------------------------------------->
-    <!-- Synths -->
-    <Module Name="rt_synth_2.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPSynthOpen"/>
-        <Api Name="RTPSynthClose"/>
-    </Module>
-    
-    <Module Name="rt_synth_4.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPSynthOpen"/>
-        <Api Name="RTPSynthClose"/>
-    </Module>
-    
-    <Module Name="rt_synth_5.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPSynthOpen"/>
-        <Api Name="RTPSynthClose"/>
-    </Module>
-    
-    <!--------------------------------------------------------------------------->
-    <!-- Other stuff -->
-    <Module Name="rt_audio_f.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPAudioOpen"/>
-        <Api Name="RTPAudioClose"/>
-    </Module>
-    
-    <Module Name="rt_audio_r.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPAudioOpen"/>
-        <Api Name="RTPAudioClose"/>
-    </Module>
-    
-    <Module Name="rt_parser_std.dll" CallingConvention="CDECL">
-        <Api Name="RTPDllGetVersion"/>
-        <Api Name="RTPParserOpen"/>
-        <Api Name="RTPParserClose"/>
-    </Module>
-    
-    <Module Name="mclib.dll" CallingConvention="CDECL">
-        <Api Name="mcompress"/>
-        <Api Name="mcompress_init"/>
-        <Api Name="mcompress_end"/>
-        <Api Name="mdecompress"/>
-        <Api Name="mdecompress_init"/>
-        <Api Name="mdecompress_end"/>
-        <Api Name="mdecompress_get_inf"/>
-    </Module>
-    
-    <Module Name="rt_error.dll" CallingConvention="CDECL">
-        <Api Name="OTSErrorGetErrorString"/>
-        <Api Name="OTSErrorGetLevelString"/>
-    </Module>
+    <ExternalFilter>
+        <Include Filename="Headers\windows.h.xml" />
+        <Variable Name="FAITH_ERROR" Type="Alias" Base="INT">
+            <Enum>
+                <Set Name="FAITH_ERROR_OK" Value="0" />
+                <Set Name="FAITH_ERROR_ERROR" Value="-1" />
+            </Enum>
+        </Variable>
+    ​
+        <Variable Name="FAITH_COMPTYPE" Type="Alias" Base="INT">
+            <Enum>
+                <Set Name="FAITH_TYPE_UNK" Value="0" />
+                <Set Name="FAITH_TYPE_AUDIO_DECODER" Value="1" />
+                <Set Name="FAITH_TYPE_SYNTH" Value="2" />
+                <Set Name="FAITH_TYPE_FORMAT_PARSER" Value="3" />
+                <Set Name="FAITH_TYPE_LSI_SIMULATOR" Value="4" />
+                <Set Name="NUM_COMPONENTS" Value="5" />
+            </Enum>
+        </Variable>
+        
+        <Variable Name="FaithComponentInfo" Type="Struct">
+            <Field Type="DWORD" Name="UNK" />
+            <Field Type="DWORD" Name="type" />
+            <Field Type="DWORD" Name="verMaj" />
+            <Field Type="DWORD" Name="verMid" />
+            <Field Type="DWORD" Name="verMin" />
+            <Field Type="char [256]" Name="name" />
+        </Variable>
+        
+        <!--------------------------------------------------------------------------->
+        <!-- Players -->
+        <Module Name="rt_player_1.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPPlayerClose"/>
+            <Api Name="RTPPlayerGetExt"/>
+            <Api Name="RTPPlayerGetState"/>
+            <Api Name="RTPPlayerGetTime"/>
+            <Api Name="RTPPlayerOpen"/>
+            <Api Name="RTPPlayerPlay"/>
+            <Api Name="RTPPlayerSeek"/>
+            <Api Name="RTPPlayerStop"/>
+        </Module>
+        
+        <Module Name="rt_player_2.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPPlayerClose"/>
+            <Api Name="RTPPlayerGetExt"/>
+            <Api Name="RTPPlayerGetState"/>
+            <Api Name="RTPPlayerGetTime"/>
+            <Api Name="RTPPlayerOpen"/>
+            <Api Name="RTPPlayerPlay"/>
+            <Api Name="RTPPlayerSeek"/>
+            <Api Name="RTPPlayerStop"/>
+        </Module>
+        
+        <Module Name="rt_player_3.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPPlayerClose"/>
+            <Api Name="RTPPlayerGetExt"/>
+            <Api Name="RTPPlayerGetState"/>
+            <Api Name="RTPPlayerGetTime"/>
+            <Api Name="RTPPlayerOpen"/>
+            <Api Name="RTPPlayerPlay"/>
+            <Api Name="RTPPlayerSeek"/>
+            <Api Name="RTPPlayerStop"/>
+        </Module>
+        
+        <Module Name="rt_player_4.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPPlayerClose"/>
+            <Api Name="RTPPlayerGetExt"/>
+            <Api Name="RTPPlayerGetState"/>
+            <Api Name="RTPPlayerGetTime"/>
+            <Api Name="RTPPlayerOpen"/>
+            <Api Name="RTPPlayerPlay"/>
+            <Api Name="RTPPlayerSeek"/>
+            <Api Name="RTPPlayerStop"/>
+        </Module>
+        
+        <Module Name="rt_player_5.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPPlayerClose"/>
+            <Api Name="RTPPlayerGetExt"/>
+            <Api Name="RTPPlayerGetState"/>
+            <Api Name="RTPPlayerGetTime"/>
+            <Api Name="RTPPlayerOpen"/>
+            <Api Name="RTPPlayerPlay"/>
+            <Api Name="RTPPlayerSeek"/>
+            <Api Name="RTPPlayerStop"/>
+        </Module>
+        
+        <!--------------------------------------------------------------------------->
+        <!-- Synths -->
+        <Module Name="rt_synth_2.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPSynthOpen"/>
+            <Api Name="RTPSynthClose"/>
+            
+            <Variable Name="FaithSynth2" Type="Struct">
+                <Field Type="void*" Name="opaqueBase" />
+                <Field Type="DWORD" Name="polyphony" />
+                <Field Type="DWORD" Name="UNK" />
+                <Field Type="void (CDECL*)(FaithSynth2*)" Name="fpFree" />
+                <Field Type="FAITH_ERROR (CDECL*)(FaithSynth2*, int32_t[256])" Name="fpRender" />
+                <Field Type="int (CDECL*)(FaithSynth2*)" Name="fpUseless1" />
+                <Field Type="void (CDECL*)(FaithSynth2*)" Name="fpKindaUseless1" />
+                <Field Type="void (CDECL*)(void)" Name="fpUseless2" />
+                <Field Type="FAITH_ERROR (CDECL*)(FaithSynth2*, int, BYTE[4], int)" Name="fpMidiFeed" />
+                <Field Type="FAITH_ERROR (CDECL*)(FaithSynth2*, int, BYTE[8])" Name="fpSysexFeed" />
+                <Field Type="void (CDECL*)(FaithSynth2*, int, int, void*)" Name="fpFunc10" />
+                <Field Type="FAITH_ERROR (CDECL*)(FaithSynth2*, int, int, BYTE*, int)" Name="fpFunc11" />
+            </Variable>
+        </Module>
+        
+        <Module Name="rt_synth_4.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPSynthOpen"/>
+            <Api Name="RTPSynthClose"/>
+        </Module>
+        
+        <Module Name="rt_synth_5.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPSynthOpen"/>
+            <Api Name="RTPSynthClose"/>
+        </Module>
+        
+        <!--------------------------------------------------------------------------->
+        <!-- Other stuff -->
+        <Module Name="rt_audio_f.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPAudioOpen"/>
+            <Api Name="RTPAudioClose"/>
+        </Module>
+        
+        <Module Name="rt_audio_r.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPAudioOpen"/>
+            <Api Name="RTPAudioClose"/>
+        </Module>
+        
+        <Module Name="rt_parser_std.dll" CallingConvention="CDECL">
+            <Api Name="RTPDllGetVersion"/>
+            <Api Name="RTPParserOpen"/>
+            <Api Name="RTPParserClose"/>
+        </Module>
+        
+        <Module Name="mclib.dll" CallingConvention="CDECL">
+            <Api Name="mcompress"/>
+            <Api Name="mcompress_init"/>
+            <Api Name="mcompress_end"/>
+            <Api Name="mdecompress"/>
+            <Api Name="mdecompress_init"/>
+            <Api Name="mdecompress_end"/>
+            <Api Name="mdecompress_get_inf"/>
+        </Module>
+        
+        <Module Name="rt_error.dll" CallingConvention="CDECL">
+            <Api Name="OTSErrorGetErrorString"/>
+            <Api Name="OTSErrorGetLevelString"/>
+        </Module>
+    </ExternalFilter>
 </ApiMonitor>
