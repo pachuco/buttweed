@@ -93,12 +93,3 @@ enum {
     MCHNG_MONOON                    = 0x7E,
     MCHNG_POLYON                    = 0x7F,
 };
-
-typedef enum {
-    MIDI_ALLOW,
-    MIDI_BLOCK,
-    MIDI_RESET,
-} MIDI_ACTION;
-
-void midi_printMidi(BYTE* pMdat, BOOL isSysex);
-MIDI_ACTION midi_filter(BYTE* pMdat, BOOL isSysex);
