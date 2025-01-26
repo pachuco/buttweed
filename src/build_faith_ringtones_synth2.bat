@@ -5,7 +5,7 @@ call getcomp.bat rosbe
 set opts=-std=c11 -mconsole -Os -s -Wall -Wextra
 set linkinc=-lwinmm
 set compiles=main\faith_ringtone_tool_synth2.c
-set compiles=%compiles% common\winmm_out.c
+set compiles=%compiles% common\winmm_audio.c common\winmm_midi.c
 set errlog=.\faith_synth2.log
 set out=..\bin\faith_synth2.exe
 call :comp

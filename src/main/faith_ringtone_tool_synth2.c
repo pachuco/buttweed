@@ -2,16 +2,9 @@
 #include <stdio.h>
 #include <conio.h>
 #include <assert.h>
-#include "../common/winmm_out.h"
+#include "../common/winmm_audio.h"
+#include "../common/winmm_midi.h"
 #include "../synth_headers/faith_ringtone_tools.h"
-
-typedef struct {
-    HMIDIIN hmi;
-    MIDIINCAPSA caps;
-    MIDIHDR mh;
-    INT index;
-    BYTE sysexBuf[1024];
-} MidiInDevice;
 
 typedef struct {
   CHAR dllName[32];
@@ -27,7 +20,7 @@ typedef struct {
 
 Synth2Gubbins g_synthGubbins = {"lib\\rt_synth_2.dll", 0};
 
-//my guess is, global volume systex.
+// my guess is, global volume systex.
 static void doInitJuju2(void* pInstance) {
 	FaithSynth2* ps2 = (void*)pInstance; 
 	
@@ -82,8 +75,10 @@ void CALLBACK cbMidiSynth2(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWO
   
   switch (wMsg) {
       case MIM_OPEN:
-        printf("Opening device: %i: %s\n", m->index+1, m->caps.szPname);
+        printf("Opening device: %i: %s\n", m->index, m->caps.szPname);
+        winmmout_enterCrit();
         doInitJuju2(pInstance);
+        winmmout_leaveCrit();
         break;
       case MIM_CLOSE:
         printf("Closing device.\n");
@@ -99,12 +94,13 @@ void CALLBACK cbMidiSynth2(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWO
         
         if (wMsg == MIM_LONGDATA) {
           //static BYTE sysexResetGM[] = {0xF0,0x7E,0x7F,0x09,0x01,0xF7};
+          
+          winmmout_enterCrit();
           //if (&m->mh.dwBytesRecorded >= sizeof(sysexResetGM) && !memcmp(&m->sysexBuf, sysexResetGM, sizeof(sysexResetGM))) {
           //  doInitJuju2(pInstance);
           //}
           
           //&m->mh.dwBytesRecorded ???????????????
-          winmmout_enterCrit();
           pInstance->fpSysexFeed(pInstance, 0, &m->sysexBuf);
           winmmout_leaveCrit();
         }
@@ -137,31 +133,7 @@ void CALLBACK cbMidiSynth2(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWO
 
 
 
-BOOL midi_init(MidiInDevice* pMid, void* cbMidi, UINT devIndex) {
-  UINT errMidi = 0;
-  
-  if (devIndex+1 > midiInGetNumDevs()) return FALSE;
-  memset(pMid, 0, sizeof(MidiInDevice));
-  
-  pMid->index = devIndex;
-  pMid->mh.lpData = (LPSTR)&pMid->sysexBuf;
-  pMid->mh.dwBufferLength = sizeof(pMid->sysexBuf);
-  pMid->mh.dwFlags = 0;
-  
-  errMidi |= midiInGetDevCapsA(devIndex, &pMid->caps, sizeof(MIDIINCAPSA));
-  errMidi |= midiInOpen(&pMid->hmi, devIndex, (DWORD_PTR)cbMidi, (DWORD_PTR)pMid, CALLBACK_FUNCTION);
-  errMidi |= midiInPrepareHeader(pMid->hmi, &pMid->mh, sizeof(MIDIHDR));
-  errMidi |= midiInAddBuffer(pMid->hmi, &pMid->mh, sizeof(MIDIHDR));
-  errMidi |= midiInStart(pMid->hmi);
-  return !errMidi;
-}
 
-void midi_close(MidiInDevice* pMid) {
-  midiInStop(pMid->hmi);
-  midiInClose(pMid->hmi);
-  midiInUnprepareHeader(pMid->hmi, &pMid->mh, sizeof(MIDIHDR));
-  memset(pMid, 0, sizeof(MidiInDevice));
-}
 
 
 void printUsage() {

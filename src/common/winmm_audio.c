@@ -6,7 +6,7 @@
 #include <windows.h>  // for mixer stream
 #include <mmsystem.h> // for mixer stream
 
-#include "winmm_out.h"
+#include "winmm_audio.h"
 
 static char isAudioActive;
 static HANDLE hThread, hAudioSem;

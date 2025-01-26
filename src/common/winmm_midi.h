@@ -1,6 +1,54 @@
 #pragma once
 #include <windows.h>
 
+typedef struct {
+    HMIDIIN hmi;
+    MIDIINCAPSA caps;
+    MIDIHDR mh;
+    INT index;
+    BYTE sysexBuf[1024];
+} MidiInDevice;
+
+BOOL midi_init(MidiInDevice* pMid, void* cbMidi, UINT devIndex);
+void midi_close(MidiInDevice* pMid);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 enum {
     MSG_TYPE_NOTEOFF                = 0x80,
