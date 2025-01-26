@@ -172,8 +172,8 @@ struct FaithSynth4p2 {
 };
 
 struct FaithSynth4 {
-  FaithSynth4p1* ptr1;
-  FaithSynth4p2* ptr2;
+  FaithSynth4p1* p1;
+  FaithSynth4p2* p2;
 };
 
 /////////////////////////////////////////////////////////////////////
