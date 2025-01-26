@@ -98,10 +98,10 @@ void CALLBACK cbMidiSynth2(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWO
         midiInUnprepareHeader(m->hmi, &m->mh, sizeof(MIDIHDR));
         
         if (wMsg == MIM_LONGDATA) {
-          static BYTE sysexResetGM[] = {0xF0,0x7E,0x7F,0x09,0x01,0xF7};
-          if (&m->mh.dwBytesRecorded >= sizeof(sysexResetGM) && !memcmp(&m->sysexBuf, sysexResetGM, sizeof(sysexResetGM))) {
-            doInitJuju2(pInstance);
-          }
+          //static BYTE sysexResetGM[] = {0xF0,0x7E,0x7F,0x09,0x01,0xF7};
+          //if (&m->mh.dwBytesRecorded >= sizeof(sysexResetGM) && !memcmp(&m->sysexBuf, sysexResetGM, sizeof(sysexResetGM))) {
+          //  doInitJuju2(pInstance);
+          //}
           
           //&m->mh.dwBytesRecorded ???????????????
           winmmout_enterCrit();
