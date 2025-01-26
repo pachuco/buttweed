@@ -2,6 +2,8 @@
 #include <stdio.h>
 #include <conio.h>
 #include <assert.h>
+#include "../common/winmm_out.h"
+#include "../synth_headers/faith_ringtone_tools.h"
 
 typedef struct {
     HMIDIIN hmi;
@@ -13,20 +15,24 @@ typedef struct {
 
 typedef struct {
   CHAR dllName[32];
-  typeof(RTPDllGetVersion) fpGetVer;
-  typeof(RTPSynthOpen) fpOpen;
-  typeof(RTPSynthClose) fpClose;
-  Synth2* pInstance;
+  HMODULE hmodSynth;
+  __typeof(RTPDllGetVersion) *fpGetVer;
+  __typeof(RTPSynthOpen) *fpOpen;
+  __typeof(RTPSynthClose) *fpClose;
+  FaithSynth2* pInstance;
 } Synth2Gubbins;
 
-Synth2Gubbins g_synthGubbins = {"rt_synth_2.dll", 0};
+#define CLAMP(X, LOW, HIGH) (((X) > (HIGH)) ? (HIGH) : (((X) < (LOW)) ? (LOW) : (X)))
+
+
+Synth2Gubbins g_synthGubbins = {"lib\\rt_synth_2.dll", 0};
 
 //my guess is, global volume systex.
-static BYTE magicJuju1[8] = {0xF0, 0x7F, 0x7F, 0x04, 0x01, 0x00, 0x7E, 0xF7};
-static BYTE magicJuju2[8] = {0xF0, 0x7F, 0x7F, 0x04, 0x02, 0x00, 0x40, 0xF7};
-static void doInitJuju2(void* pSynth) {
-	Synth2* ps2 = (void*)pSynth; 
+static void doInitJuju2(void* pInstance) {
+	FaithSynth2* ps2 = (void*)pInstance; 
 	
+  static BYTE magicJuju1[8] = {0xF0, 0x7F, 0x7F, 0x04, 0x01, 0x00, 0x7E, 0xF7};
+  static BYTE magicJuju2[8] = {0xF0, 0x7F, 0x7F, 0x04, 0x02, 0x00, 0x40, 0xF7};
 	ps2->fpKindaUseless1(ps2);
 	ps2->fpSysexFeed(ps2, 0, magicJuju1);
 	ps2->fpSysexFeed(ps2, 0, magicJuju2);
@@ -39,10 +45,10 @@ static void doInitJuju2(void* pSynth) {
 
 void cbAudioRenderSynth2(void* buffer, int numSamples) {
   int32_t tBuf[SYNTH2_RENDERBUF*2] = {0};
-  Synth2* pSynth = g_synthGubbins->pInstance;
+  FaithSynth2* pInstance = g_synthGubbins.pInstance;
   
   assert(numSamples == SYNTH2_RENDERBUF);
-  pSynth->fpRender(pSynth, buffer);
+  pInstance->fpRender(pInstance, tBuf);
 
   for (int i=0; i<SYNTH2_RENDERBUF*2; i++) ((int16_t*)buffer)[i] = CLAMP(tBuf[i], -32768, 32767);
 }
@@ -56,10 +62,8 @@ BOOL synth_init(Synth2Gubbins* pSc) {
   pSc->fpClose  = (void*)GetProcAddress(pSc->hmodSynth, "RTPSynthClose");
   if (!pSc->hmodSynth || !pSc->fpGetVer || !pSc->fpOpen || !pSc->fpClose) return FALSE;
   
-  pSc->pSynth = pSc->fpOpen(&dummy);
-  if (!pSc->pSynth) return FALSE;
-  
-  doInitJuju2(pSc->pSynth);
+  pSc->pInstance = pSc->fpOpen(&dummy);
+  if (!pSc->pInstance) return FALSE;
   
   return TRUE;
 }
@@ -74,18 +78,19 @@ BOOL synth_init(Synth2Gubbins* pSc) {
 
 void CALLBACK cbMidiSynth2(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWORD_PTR dwParam1, DWORD_PTR dwParam2) { 
   MidiInDevice* m = (MidiInDevice*)dwInstance;
-  Synth2* pSynth = g_synthGubbins->pInstance;
+  FaithSynth2* pInstance = g_synthGubbins.pInstance;
   
   switch (wMsg) {
       case MIM_OPEN:
         printf("Opening device: %i: %s\n", m->index+1, m->caps.szPname);
+        doInitJuju2(pInstance);
         break;
       case MIM_CLOSE:
         printf("Closing device.\n");
         break;
       case MIM_DATA:
         winmmout_enterCrit();
-        pSynth->fpMidiFeed(pSynth, 0, (BYTE*)&dwParam1, 1);
+        pInstance->fpMidiFeed(pInstance, 0, (BYTE*)&dwParam1, 1);
         winmmout_leaveCrit();
         break;
       case MIM_LONGDATA:
@@ -93,9 +98,14 @@ void CALLBACK cbMidiSynth2(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWO
         midiInUnprepareHeader(m->hmi, &m->mh, sizeof(MIDIHDR));
         
         if (wMsg == MIM_LONGDATA) {
+          static BYTE sysexResetGM[] = {0xF0,0x7E,0x7F,0x09,0x01,0xF7};
+          if (&m->mh.dwBytesRecorded >= sizeof(sysexResetGM) && !memcmp(&m->sysexBuf, sysexResetGM, sizeof(sysexResetGM))) {
+            doInitJuju2(pInstance);
+          }
+          
           //&m->mh.dwBytesRecorded ???????????????
           winmmout_enterCrit();
-          pSynth->fpSysexFeed(pSynth, 0, &m->sysexBuf);
+          pInstance->fpSysexFeed(pInstance, 0, &m->sysexBuf);
           winmmout_leaveCrit();
         }
 
@@ -127,7 +137,7 @@ void CALLBACK cbMidiSynth2(HMIDIIN hMidiIn, UINT wMsg, DWORD_PTR dwInstance, DWO
 
 
 
-BOOL midi_init(MidiInDevice* pMid, void* cbMidi, INT devIndex) {
+BOOL midi_init(MidiInDevice* pMid, void* cbMidi, UINT devIndex) {
   UINT errMidi = 0;
   
   if (devIndex+1 > midiInGetNumDevs()) return FALSE;
@@ -164,6 +174,8 @@ void printUsage() {
   );
 }
 
+
+MidiInDevice g_midev = {0};
 int main(int argc, char* argv[]) {
   if (argc != 2) {
     printUsage();
@@ -174,7 +186,6 @@ int main(int argc, char* argv[]) {
     printUsage();
     return 0;
   } else {
-    MidiInDevice midev = {0};
     UINT devIndex = strtol(argv[1], NULL, 10);
     
     // ignore if strtol returns 0 because of failure
@@ -183,7 +194,7 @@ int main(int argc, char* argv[]) {
       return 1;
     }
     
-    if (!synth_init(&g_lf4)) {
+    if (!synth_init(&g_synthGubbins)) {
       fprintf(stderr, "Synth init failure!\n");
       return 1;
     }
@@ -194,8 +205,8 @@ int main(int argc, char* argv[]) {
       fprintf(stderr, "Audio-out init error!\n");
       return 1;
     }
-
-    if (!midi_init(&midev, &cbMidiSynth2, devIndex)) {
+    
+    if (!midi_init(&g_midev, &cbMidiSynth2, devIndex)) {
       fprintf(stderr, "Midi-in init error!\n");
       return 1;
     }
@@ -213,7 +224,7 @@ int main(int argc, char* argv[]) {
     }
 
     winmmout_closeMixer();
-    midi_close(&midev);
+    midi_close(&g_midev);
   }
 
   return 0;
